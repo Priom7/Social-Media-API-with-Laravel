@@ -19,23 +19,24 @@ class PostController extends Controller
     public function index()
     {
         $user = auth()->user();
-        $user_pages = Page::with('post')->where('user_id', $user->id)->get();
-        $user_post = Post::where('user_id', $user->id)->get();
-        $following_user = Following::with('user:id,name', 'user.posts:id,body,user_id')->where('person_id', $user->id)->get();
-        $following_page = Following::with('page:id,name', 'page.post:id,body,page_id')->where('person_id', $user->id)->get();
+
+        $user_post = Post::where('user_id', $user->id)
+            ->orWhereHas('page', function ($query) use ($user) {
+                $query->where('user_id', $user->id);
+            })
+            ->orWhereHas('user.following', function ($query) use ($user) {
+                $query->where('person_id', $user->id);
+            })
+            ->orWhereHas('page.following', function ($query) use ($user) {
+                $query->where('person_id', $user->id);
+            })
+            ->paginate(5);
+
+
 
         return [
-            'user' => $user,
             'user_post' => $user_post,
-            'user_pages_post' => $user_pages,
-            'following_user_post' => $following_user,
-            'following_page_post' => $following_page
         ];
-    }
-
-    public function show(Post $post)
-    {
-        return $post;
     }
 
     public function person_create(Request $request)

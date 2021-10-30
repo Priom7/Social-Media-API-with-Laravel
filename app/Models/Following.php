@@ -16,6 +16,7 @@ class Following extends Model
         return  $this->belongsTo(SourceType::class);
     }
 
+
     public function user()
     {
         return  $this->hasMany(User::class, 'id', 'following_person_id');

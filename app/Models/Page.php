@@ -23,8 +23,8 @@ class Page extends Model
         return   $this->belongsTo(User::class);
     }
 
-    public function followers()
+    public function following()
     {
-        return  $this->hasMany(Following::class);
+        return  $this->hasMany(Following::class, 'following_page_id', 'id');
     }
 }
